@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行動ブレーキ診断</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 20px;
+        }
+        #root {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .content {
+            padding: 30px;
+        }
+        .intro-text p {
+            margin-bottom: 1em;
+        }
+        .brake-category, .additional-brake-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--light-gray);
+        }
+        .brake-category h2, .additional-brake-item h3 {
+            margin-top: 0;
+            font-size: 1.3em;
+            color: var(--primary-color);
+        }
+        .brake-category h2 span, .additional-brake-item h3 span {
+            font-size: 0.8em;
+            color: #6c757d;
+            display: block;
+            margin-top: 5px;
+        }
+        .brake-category-description, .additional-brake-item p {
+            font-size: 0.95em;
+            margin: 10px 0 20px 0;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .question-label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .options-container {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+        .options-container span {
+            font-size: 0.85em;
+            color: #6c757d;
+            text-align: center;
+        }
+        .options-container span:first-of-type {
+            justify-self: start;
+        }
+        .options-container span:last-of-type {
+            justify-self: end;
+        }
+        .options-group {
+            display: flex;
+            flex-wrap: nowrap; /* Changed */
+            justify-content: center;
+            gap: 5px;
+            overflow-x: auto; /* Added */
+            padding-bottom: 10px; /* Added for scrollbar space */
+        }
+        .options-group label {
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: #fff;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+            min-width: 20px;
+            text-align: center;
+            flex-shrink: 0; /* Prevent buttons from shrinking */
+        }
+        .options-group input:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .options-group input {
+            display: none;
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-align: center;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .results-summary h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-bar-container {
+            margin-bottom: 15px;
+        }
+        .result-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .result-bar {
+            height: 20px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .result-bar-inner {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.5s ease-in-out;
+            text-align: right;
+            color: white;
+            font-size: 0.8em;
+            line-height: 20px;
+            padding-right: 5px;
+        }
+        .strongest-brakes, .additional-brakes {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+        .solution-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--success-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .solution-card h4 {
+            margin: 0 0 10px 0;
+        }
+        .deep-dive-question {
+             background-color: #fff3cd;
+             border-left: 5px solid var(--warning-color);
+             padding: 15px;
+             margin: 20px 0;
+             border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const brakesData = [
+            {
+                id: 1,
+                name: "①価値＝期待 × 報酬の不足",
+                subtitle: "「がんばってもムダかも…」ストッパー",
+                description: "「どうせ無理」「得しても小さい」 → 行動コストが上回る・・・「どうせできないし、もらえるごほうびも少ない」と思ってしまう",
+                questions: [
+                    "1.この行動が成功すると、私の人生に大きなメリットがあると感じる。",
+                    "2.成功確率は高いと自分で思える。",
+                    "3.労力のわりに得られる報酬が大きいと感じる。",
+                    "4.成功した自分を想像するとワクワクする。",
+                    "5.失敗しても致命傷にはならないと感じる。",
+                    "6.周囲から評価される可能性が高いと思う。",
+                    "7.短期間でも成果が体感できると信じている。",
+                    "8.他にもっと価値の高い行動はないと納得している。",
+                    "9.この行動を放置すると将来後悔すると思う。",
+                    "10.報酬が倍になっても私のやる気はあまり変わらない。"
+                ],
+                deepDive: [
+                    "1.「この行動がうまくいったとき、一番最初にどんな変化を実感したいですか？」",
+                    "2.「その変化が “本当に自分にとって大切だ” と感じる根拠は何ですか？」",
+                    "3.「成功後のあなたを、周囲の人はどう評価すると想像しますか？」"
+                ],
+                solutions: [
+                    { title: "成功1日体験", description: "未来の自分の成功した１日を文章／音声で臨場再生。朝起きてから寝るまで、理想の1日を具体的に描くことで、報酬のイメージを強化する。" },
+                    { title: "ゴール分割", description: "90日ゴール→3日ゴールへ細分化。遠い未来より、すぐ達成できる小さな目標を立て、成功体験を積み重ねる。" },
+                    { title: "コストの見える化", description: "放置した場合の損失をリスト化。「もし今やらなかったら、1年後どうなっている？」と問いかけ、機会損失を具体的にする。" },
+                    { title: "ごほうびの付与", description: "達成後に好きなことができる。「このタスクが終わったら、好きな映画を観る」など、自分だけの報酬を設定する。" },
+                    { title: "他者貢献フレーム", description: "行動が誰を助けるのかを書き出す。自分のためだけでなく、「この行動が家族を笑顔にする」など、他者への影響を考えると価値が高まる。" },
+                    { title: "（追加案）価値観インタビュー", description: "信頼できる友人に「私の良いところって何だと思う？」と聞き、自分の価値観や強みを再発見する。行動がその価値観に沿っているか確認する。" },
+                ]
+            },
+            {
+                id: 2,
+                name: "②実行機能の枯渇",
+                subtitle: "「もう決めるの疲れた…」ストッパー",
+                description: "選択肢が多い・判断回数が多いと「もういいや」・・・えらぶこと・考えることが多すぎて、頭がぐるぐるして止まっちゃう",
+                questions: [
+                    "11.　1 日の終わりでも集中力が保てる。",
+                    "12.タスクを始めるまでに迷わず取りかかれる。",
+                    "13.決断を先延ばしにせず即断即決できる。",
+                    "14.仕事が立て込んでも優先順位をすぐ決められる。",
+                    "15.スマホ通知や雑音に注意を奪われにくい。",
+                    "16.「今日はもう頭が回らない」と感じることが少ない。",
+                    "17.ルーティン化している作業が多く、意思力を節約できている。",
+                    "18.前日の夜に翌日の行動計画を立てている。",
+                    "19.決断の回数を減らす工夫（服・食事などの定型化）をしている。",
+                    "20.疲労を感じても短時間で回復できる方法を持っている。"
+                ],
+                deepDive: [
+                    "1.「着手までに “迷い” が生じる瞬間は、具体的にどんなときですか？」",
+                    "2.「その迷いを断ち切れた過去の経験があれば、何がトリガーでしたか？」",
+                    "3.「今日の意思決定を “あと１つ” 減らすとしたら、何を自動化しますか？」"
+                ],
+                solutions: [
+                    { title: "意思決定ダイエット", description: "前夜に翌日の服・昼食などの優先３タスクを決定。朝の決断疲れをなくす。" },
+                    { title: "タイムブロッキング", description: "60分集中＋15分休憩のサイクルを作る。ポモドーロテクニック（25分+5分）も有効。" },
+                    { title: "チェックリスト化", description: "作業を 3～5 ステップへテンプレート化。思考停止で動けるようにする。" },
+                    { title: "通知一括タイム", description: "メール／SNS確認は 、まとめて1 日 2 回に限定する。集中を妨げる要因をコントロールする。" },
+                    { title: "おやつ＆水分補給", description: "エネルギー切れを防ぐ。甘いものと水分でチャージする。脳のエネルギーはブドウ糖。" },
+                    { title: "（追加案）2分ルール", description: "「2分以内で終わるタスク」はその場で片付ける。先延ばしを防ぎ、タスクリストをクリーンに保つ。" },
+                ]
+            },
+            {
+                id: 3,
+                name: "③時間割引（先延ばし）",
+                subtitle: "「今すぐのほうが楽しい！」ストッパー",
+                description: "未来報酬＜即時快楽 → 先延ばし・・・先にもらえる大きなごほうびより、今すぐの小さな楽しさを選んでしまう",
+                questions: [
+                    "21.締め切りがなくても自分で期限を決めて守れる。",
+                    "22.面倒なタスクもすぐに手を付ける。",
+                    "23.「あとでやろう」と言って放置したことはほとんどない。",
+                    "24.小さなご褒美がなくても着手できる。",
+                    "25.未来の利益より目先の快楽を優先することは少ない。",
+                    "26.期限ギリギリで慌てることがほとんどない。",
+                    "27. 5 分以内で終わる雑務はその場で片づける癖がある。",
+                    "28. 1 日の計画変更があってもすぐリスケできる。",
+                    "29.やるべきことを思い出して不安になることは少ない。",
+                    "30.先延ばししそうなときの対処策（タイマー、宣言など）をもっている。"
+                ],
+                deepDive: [
+                    "1.「“あとでやろう” と決めた直後、頭の中でどんな言い訳が流れますか？」",
+                    "2.「先延ばしの最中、体や感情にどんな変化が起きていますか？」",
+                    "3.「着手できたときの自分に、今ひとこと声をかけるとしたら何と言いますか？」"
+                ],
+                solutions: [
+                    { title: "15 分スタート", description: "タイマーをかけ開始にコミットする。「15分だけ」と決めると、心理的ハードルが劇的に下がる。" },
+                    { title: "即時ごほうび", description: "終了後すぐ動画 1 本／コーヒー 1 杯。行動と快楽を直結させる。" },
+                    { title: "好きな音楽をかける", description: "タスク中は好きな音楽だけ流せる。タスクを楽しい時間と紐づける。" },
+                    { title: "公言する", description: "SNS で宣言し、失敗時は寄付。社会的なコミットメントを利用する。" },
+                    { title: "時間実行ワーク", description: "「〇時に机に座ったら〇〇を開く」。行動のきっかけを具体的に決めておく。" },
+                    { title: "（追加案）誘惑の排除", description: "作業を始める前に、スマホを別の部屋に置く、SNSをブロックするなど、誘惑される物理的な可能性を断つ。" },
+                ]
+            },
+            {
+                id: 4,
+                name: "④負の情動優位",
+                subtitle: "「失敗したらイヤだ！」ストッパー",
+                description: "不安／恐怖＝回避シグナル → 行動抑制・・・こわい気持ちや不安が大きくて、行動にブレーキがかかる",
+                questions: [
+                    "31.行動前に強い不安や恐怖を感じない。",
+                    "32.失敗しても自分を責めすぎない。",
+                    "33.他人の評価を気にせず行動できる。",
+                    "34.心拍数や呼吸が乱れてもすぐ落ち着かせられる。",
+                    "35.新しい挑戦を楽しみとして捉えられる。",
+                    "36.「もし失敗したら…」という想像で動きが止まることは少ない。",
+                    "37.不安が出ても客観的に言語化できる。",
+                    "38.自己批判より自己リフレーミング（意味付け）の時間が長い。",
+                    "39.行動を一緒にやる仲間がいれば安心感が高まる。",
+                    "40.不安を30％減らす具体的なセルフケア習慣がある。"
+                ],
+                deepDive: [
+                    "1.「この行動を考えるとき、一番大きな不安はどんなイメージで現れますか？」",
+                    "2.「その不安が 0〜100 で 30 だけ小さくなったら、あなたの行動はどう変わりそうですか？」",
+                    "3.「恐れより “ワクワク” が勝った瞬間の過去体験を、１つ教えてください。」"
+                ],
+                solutions: [
+                    { title: "深呼吸 のすすめ（4-7-8）", description: "4 秒吸う-7 秒止める-8 秒吐く ×3 セット。副交感神経を優位にし、心を落ち着かせる。" },
+                    { title: "失敗はデータ取り", description: "「失敗＝データ収集」と言いかえる。成功のための貴重な情報と捉え直す。" },
+                    { title: "小分け作戦", description: "恐い作業を 10% → 30% → 50%と徐々に負荷をかける。スモールステップで恐怖に慣れる。" },
+                    { title: "安心アンカリング", description: "開始前に成功体験のある写真を見る、音楽を聴く。安心できる状態を意識的に作り出す。" },
+                    { title: "セルフコンパッション", description: "ジャーナリング・瞑想をして、前向きな気持ちを持ち続ける。自分への優しさを育む。" },
+                    { title: "（追加案）最悪の事態を書き出す", description: "「もし最悪の事態が起きたら？」を具体的に書き出し、その対処法も考えておく。漠然とした不安が具体的な課題に変わる。" },
+                ]
+            },
+            {
+                id: 5,
+                name: "⑤習慣の惰性",
+                subtitle: "「いつものクセ」ストッパー",
+                description: "旧習慣が自動発火 → 新行動が入り込む余地がない・・・ずっとやっている行動が勝手にスイッチオン。新しいことが入りにくい",
+                questions: [
+                    "41.朝のルーティンに新しい行動を組み込むのが得意だ。",
+                    "42.悪習慣をやめるときは環境を変えて成功してきた。",
+                    "43.If-Then プランニング（「もし～したら、～する」）を活用している。",
+                    "44.毎日決まった時間に同じタスクを自動的に始められる。",
+                    "45.既存の習慣に紐づけて行動を追加するのが得意だ。",
+                    "46.三日坊主になることはほとんどない。",
+                    "47.習慣化の報酬（チェックリスト、SNS共有など）を設定している。",
+                    "48.悪習慣のトリガーを意識的に排除できている。",
+                    "49.週に 3 回以上、同じ行動を継続できている。",
+                    "50.新しい習慣が定着するまでの期間を自分で把握している。"
+                ],
+                deepDive: [
+                    "1.「今の暮らしで、無意識に繰り返している行動トップ３は何ですか？」",
+                    "2.「そのうち１つを “やめた or 置き換えた” としたら、どこが一番ラクそうですか？」",
+                    "3.「新しい習慣が根づいたと確信した瞬間を、できるだけ具体的に教えてください。」"
+                ],
+                solutions: [
+                    { title: "トリガーの入替", description: "帰宅→TV の代わりに、帰宅→散歩 5 分。いつもと違う行動をとることで、古い習慣の連鎖を断ち切る。" },
+                    { title: "習慣スタッキング", description: "毎日やっている行動に、新しい行動をくっつけると習慣化しやすい。「歯磨きをしたら、1分間瞑想する」など。" },
+                    { title: "環境リセット", description: "作業机に PC 以外の物を置かない。行動を誘発する環境を意図的に作る。" },
+                    { title: "カウントを記録", description: "連続日数をアプリで可視化。継続がモチベーションになる。" },
+                    { title: "報告する", description: "毎晩 LINE で「やった／やってない」を報告。他者の力を借りて継続する。" },
+                    { title: "（追加案）習慣の最小化", description: "「毎日30分運動する」が目標なら、「毎日ウェアに着替える」から始める。行動の最初の1ステップだけを習慣にする。" },
+                ]
+            },
+            {
+                id: 6,
+                name: "⑥自己同一性ギャップ",
+                subtitle: "「私らしくない…」ストッパー",
+                description: "「自分らしくない」と無意識で拒否・・・「こんなの自分っぽくない」と感じて、心が拒否しちゃう",
+                questions: [
+                    "51.この行動は「自分らしい」と感じる。",
+                    "52.理想の自分像と今の自分像の差は小さい。",
+                    "53.行動を続けることでアイデンティティが強化されると感じる。",
+                    "54.周囲の期待より自分の価値観を重視している。",
+                    "55.挑戦で一時的に自己評価が下がっても受け入れられる。",
+                    "56.行動する自分をポジティブな言葉でラベル付けできる。",
+                    "57.ロールモデルを思い浮かべて行動を決めることが多い。",
+                    "58.将来の自分からの助言を想像するとモチベーションが上がる。",
+                    "59.「○○な人ならどうするか？」という視点で行動を最適化できる。",
+                    "60.行動が長期的な自己ストーリーにつながっていると感じる。"
+                ],
+                deepDive: [
+                    "1.「この行動を続ける “あなたらしさ” を ひと言でラベルにすると何になりますか？」",
+                    "2.「理想の自分が今日のあなたにアドバイスするとしたら、どんな言葉をかけそうですか？」",
+                    "3.「“自分らしくない” と感じたタイミングがあれば、それを 10 秒映画にするとどんなシーンですか？」"
+                ],
+                solutions: [
+                    { title: "アイデンティティ宣言", description: "「私は◯◯な人」と壁に貼る。新しい自己イメージを視覚的にインプットする。" },
+                    { title: "未来自分への手紙", description: "90日後の自分から現在を励ます手紙を書く。未来の視点から今の行動を意味づける。" },
+                    { title: "ロールモデルのコピー", description: "憧れの人のルーティンをコピーする。「あの人ならどうするか？」を具体的に真似る。" },
+                    { title: "ビフォーアフター", description: "行動前→後の自分を書き出してみる。行動による自己変革を可視化する。" },
+                    { title: "新セルフイメージにコミットする", description: "名刺やプロフィールに新セルフラベルを記載。社会的に新しい自分を宣言する。" },
+                    { title: "（追加案）小さな実験と捉える", description: "「自分らしくない」と感じる行動を「お試し期間」と位置づける。「1週間だけこの役割を演じてみよう」と考えると、抵抗が和らぐ。" },
+                ]
+            },
+            {
+                id: 7,
+                name: "⑦環境制約・社会的摩擦",
+                subtitle: "「場所や人がジャマ」ストッパー",
+                description: "対人摩擦・物理的障害で摩耗・・・周りの環境や人のせいで、やりたいことがやりにくい",
+                questions: [
+                    "61.行動に必要な時間を毎週確保できている。",
+                    "62.必要なツールや資源はすべて手元にある。",
+                    "63.家族や同僚は私の行動をサポートしてくれる。",
+                    "64.作業スペースには気を散らすものが少ない。",
+                    "65.ネット環境やデバイス性能で作業が止まることはない。",
+                    "66.通知や騒音で集中が途切れる頻度は低い。",
+                    "67.オンラインツールの使い勝手にストレスを感じない。",
+                    "68.行動の成果に対するフィードバックを得やすい。",
+                    "69.外出や移動で計画が崩れても代替手段を用意している。",
+                    "70.自分が最も生産的になれる環境を意図的に整えている。"
+                ],
+                deepDive: [
+                    "1.「この行動を邪魔する “外的ノイズ” を３つ挙げるとしたら何ですか？」",
+                    "2.「もし環境を １ つだけ変えられるとしたら、どこをどう整えますか？」",
+                    "3.「あなたが最も集中できた環境を思い出し、その共通点を３語で表すと何ですか？」"
+                ],
+                solutions: [
+                    { title: "静かな場所＆集中スペースの確保", description: "図書館・コワーキングスペースを予約。物理的に集中できる環境に身を置く。" },
+                    { title: "ネットスイッチOFF", description: "ワンクリックで Wi-Fi を切り、ゲームやSNS通知をシャットアウト。" },
+                    { title: "道具をひとまとめに", description: "必要な道具だけカゴに入れ、「出す→使う→戻す」をワンセット。行動開始の摩擦を減らす。" },
+                    { title: "協力してもらう宣言", description: "家族・友人に時間帯を宣言し、邪魔をブロック。「この時間は集中します」と伝える。" },
+                    { title: "整理整頓ルール", description: "作業前に部屋や机の不要物を片づけ。精神的なノイズを減らす。" },
+                    { title: "（追加案）ヘッドフォン投資", description: "質の良いノイズキャンセリングヘッドフォンを使う。物理的に騒音を遮断し、「集中モード」のスイッチにする。" },
+                ]
+            }
+        ];
+
+        const additionalBrakesData = [
+            { name: "①睡眠負債モデル／自律神経バランス", subtitle: "エネルギー切れストッパー", description: "寝不足・空腹・慢性疲労で“ガソリン不足”になり、やる気より先に体が STOP・・・ねむい・おなかすいた・からだがだるいと、やる気スイッチが入らない。" },
+            { name: "②完璧主義認知モデル", subtitle: "完璧主義ストッパー", description: "100点じゃないと GO を出せず、いつまでもスタートできない・・・100点でないと始めたくない。「まだまだダメだ」で動けなくなる。" },
+            { name: "③情報過多理論／認知負荷理論", subtitle: "情報あふれストッパー", description: "資料・通知・アプリが多すぎ“何から？”でフリーズ・・・本・動画・アプリ…材料が多すぎて「どれから？」で止まる。" },
+            { name: "④社会的比較理論", subtitle: "比較して落ち込むストッパー", description: "SNSで他人を見て「自分なんて…」と萎縮→手が止まる・・・すごい結果を見て「私なんて…」としょんぼりして手が止まる。" },
+            { name: "⑤学習性無力感理論／自己効力感理論", subtitle: "学習性ムリかもストッパー", description: "過去の連続失敗→「何をしても同じ」と学習→無力感・・・むかし失敗が続いて「どうせやってもムダ」と思いこんでしまう。" },
+            { name: "⑥知識・技能習得曲線", subtitle: "能力・スキル不足ストッパー", description: "技術・知識が足りず「やり方がわからない」ため停止・・・やり方を知らない・コツを知らないから「どうやるの？」で止まっちゃう。" },
+            { name: "⑦資源保存理論", subtitle: "リソース不足ストッパー", description: "時間・お金・人手・設備が物理的に足りず進まない・・・やりたいけど、時間やおこづかい、手伝ってくれる人などが足りない。" },
+            { name: "⑧認知的不協和理論", subtitle: "価値観・倫理の衝突ストッパー", description: "行動は可能でも「自分の信念と合わない」ためブレーキ・・・「やること」は決まったけど、自分の大事な気持ちや考えとぶつかってイヤになる。" },
+            { name: "⑨目標設定理論", subtitle: "ゴールの曖昧さストッパー", description: "目標がぼやけ、優先順位や着手点が決まらず止まる・・・何を目指すのかハッキリしなくて、「まず何する？」が決められない。" },
+            { name: "⑩フィードバック介入理論／進歩の法則", subtitle: "フィードバック欠如ストッパー", description: "進捗が測れず「やっても意味ある？」と熱が冷める・・・頑張っても進んでるか分からず、「これ意味あるの？」とやる気が消える。" },
+        ];
+
+        const App = () => {
+            const [page, setPage] = React.useState('intro'); // intro, assessment, results
+            const [scores, setScores] = React.useState(null);
+
+            const startAssessment = () => {
+                setPage('assessment');
+            };
+
+            const showResults = (finalScores) => {
+                setScores(finalScores);
+                setPage('results');
+            };
+            
+            const restart = () => {
+                setScores(null);
+                setPage('intro');
+            }
+
+            return (
+                <div>
+                    <div className="header">
+                        <h1>行動ブレーキ診断</h1>
+                    </div>
+                    <div className="content">
+                        {page === 'intro' && <Intro onStart={startAssessment} />}
+                        {page === 'assessment' && <Assessment onFinish={showResults} />}
+                        {page === 'results' && scores && <Results scores={scores} onRestart={restart} />}
+                    </div>
+                </div>
+            );
+        };
+
+        const Intro = ({ onStart }) => (
+            <div className="intro-text">
+                <p><strong>このシートの役割は、ブレーキの種類を知ることです。</strong></p>
+                <p>心の中の気持ちやいつものクセ、まわりの環境が「ストッパー（ブレーキ）」になると行動が止まっちゃう。</p>
+                <p>70の質問に答えて、あなたの行動を妨げているブレーキの正体を突き止めましょう。</p>
+                <p>各質問に対して「1 ＝ 全く当てはまらない」から「10 ＝ 完全に当てはまる」 の10段階で、直感的に答えてください。</p>
+                <p><small>※高いスコアほどブレーキが弱い／ 低いスコアほどブレーキが強い、という読み方になります。</small></p>
+                <button className="btn" onClick={onStart}>診断をはじめる</button>
+            </div>
+        );
+
+        const Assessment = ({ onFinish }) => {
+            const [answers, setAnswers] = React.useState({});
+
+            const handleAnswerChange = (qIndex, value) => {
+                setAnswers(prev => ({ ...prev, [qIndex]: value }));
+            };
+
+            const handleSubmit = () => {
+                if (Object.keys(answers).length < 70) {
+                    alert('すべての質問に回答してください。');
+                    return;
+                }
+                onFinish(answers);
+            };
+
+            let questionCounter = 0;
+
+            return (
+                <div>
+                    {brakesData.map((category, catIndex) => (
+                        <div key={category.id} className="brake-category">
+                            <h2>{category.name}<span>{category.subtitle}</span></h2>
+                            <p className="brake-category-description">{category.description}</p>
+                            {category.questions.map((q, qIndex) => {
+                                const globalQIndex = questionCounter++;
+                                return (
+                                    <div key={globalQIndex} className="question">
+                                        <span className="question-label">{q}</span>
+                                        <div className="options-container">
+                                            <span>当てはまらない</span>
+                                            <div className="options-group">
+                                                {[...Array(10)].map((_, i) => {
+                                                    const value = i + 1;
+                                                    return (
+                                                        <React.Fragment key={value}>
+                                                            <input 
+                                                                type="radio" 
+                                                                id={`q${globalQIndex}_${value}`} 
+                                                                name={`q${globalQIndex}`} 
+                                                                value={value} 
+                                                                onChange={() => handleAnswerChange(globalQIndex, value)}
+                                                                checked={answers[globalQIndex] === value}
+                                                            />
+                                                            <label htmlFor={`q${globalQIndex}_${value}`}>{value}</label>
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </div>
+                                            <span>当てはまる</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                    <button className="btn" onClick={handleSubmit}>結果を見る</button>
+                </div>
+            );
+        };
+
+        const Results = ({ scores, onRestart }) => {
+            const results = brakesData.map(category => {
+                const categoryScores = category.questions.map((_, qIndex) => scores[category.id * 10 - 10 + qIndex] || 0);
+                const average = categoryScores.reduce((a, b) => a + b, 0) / categoryScores.length;
+                return { ...category, average: average.toFixed(1) };
+            });
+
+            // Low score = strong brake
+            const sortedResults = [...results].sort((a, b) => a.average - b.average);
+            const strongestBrakes = sortedResults.slice(0, 2);
+
+            return (
+                <div className="results-summary">
+                    <h2>診断結果</h2>
+                    <p>あなたの行動ブレーキの強さが明らかになりました。スコアが低いほど、そのブレーキが強く働いていることを示します。</p>
+                    {results.map(res => (
+                        <div key={res.id} className="result-bar-container">
+                            <div className="result-bar-label">
+                                <span>{res.name}</span>
+                                <span>{res.average} / 10.0</span>
+                            </div>
+                            <div className="result-bar">
+                                <div className="result-bar-inner" style={{ width: `${res.average * 10}%` }}></div>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="strongest-brakes">
+                        <h2>あなたの最も強いブレーキ TOP 2</h2>
+                        {strongestBrakes.map(brake => (
+                            <div key={brake.id} className="brake-category">
+                                <h2>{brake.name}<span>{brake.subtitle}</span></h2>
+                                
+                                <h4>ブレーキを深掘りする質問</h4>
+                                {brake.deepDive.map((q, i) => (
+                                    <p key={i} className="deep-dive-question">{q}</p>
+                                ))}
+
+                                <h4>解決カード</h4>
+                                {brake.solutions.map((sol, i) => (
+                                    <div key={i} className="solution-card">
+                                        <h4>{sol.title}</h4>
+                                        <p>{sol.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="additional-brakes">
+                        <h2>参考：その他のブレーキモデル（10種類）</h2>
+                        {additionalBrakesData.map((brake, i) => (
+                            <div key={i} className="additional-brake-item">
+                                <h3>{brake.name}<span>{brake.subtitle}</span></h3>
+                                <p>{brake.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <button className="btn btn-secondary" onClick={onRestart} style={{marginTop: '20px'}}>もう一度診断する</button>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
