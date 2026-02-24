@@ -4,119 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>行動ブレーキ診断（14問版）</title>
+    <title>行動ブレーキ診断 | Take Your Time.</title>
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary-color: #007bff;
-            --light-gray: #f8f9fa;
-            --dark-gray: #343a40;
-            --border-color: #dee2e6;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --primary-color: #2c3e50;
+            /* 深いネイビーで知的な落ち着きを */
+            --accent-color: #b89f7a;
+            /* 上品なゴールド/ブロンズ系 */
+            --bg-color: #fcfcfc;
+            --text-main: #222222;
+            --text-muted: #555555;
+            --border-color: #e5e5e5;
+            --card-bg: #ffffff;
             --line-color: #06C755;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--dark-gray);
-            background-color: #f4f7f9;
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.8;
+            color: var(--text-main);
+            background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            padding: 30px 15px;
+            letter-spacing: 0.03em;
         }
 
         #root {
-            max-width: 800px;
+            max-width: 760px;
             margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
             overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .header {
             background-color: var(--primary-color);
             color: white;
-            padding: 20px 30px;
+            padding: 30px 30px;
             text-align: center;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 1.8em;
+            font-size: 1.5em;
+            font-weight: 500;
+            letter-spacing: 0.1em;
         }
 
         .progress-container {
             width: 100%;
-            background-color: #e9ecef;
-            height: 10px;
+            background-color: #f0f0f0;
+            height: 6px;
         }
 
         .progress-bar {
             height: 100%;
-            background-color: var(--primary-color);
-            transition: width 0.3s ease;
+            background-color: var(--accent-color);
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .content {
-            padding: 30px;
+            padding: 40px;
+        }
+
+        .intro-text {
+            text-align: center;
+            font-weight: 300;
         }
 
         .intro-text p {
-            margin-bottom: 1em;
+            margin-bottom: 1.5em;
+            font-size: 1.05em;
+            color: var(--text-main);
         }
 
-        .brake-category,
-        .additional-brake-item {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--light-gray);
-        }
-
-        .brake-category h2,
-        .additional-brake-item h3 {
-            margin-top: 0;
-            font-size: 1.3em;
+        .intro-text strong {
+            font-weight: 500;
             color: var(--primary-color);
         }
 
-        .brake-category h2 span,
-        .additional-brake-item h3 span {
-            font-size: 0.8em;
-            color: #6c757d;
-            display: block;
-            margin-top: 5px;
-        }
-
-        .brake-category-description,
-        .additional-brake-item p {
-            font-size: 0.95em;
-            margin: 10px 0 20px 0;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-        }
-
         .question {
-            margin-bottom: 25px;
-            padding: 15px;
-            background: #fff;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: var(--card-bg);
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eee;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-2px);
+            border-color: #d0d0d0;
         }
 
         .question-label {
             display: block;
-            margin-bottom: 15px;
-            font-weight: bold;
+            margin-bottom: 20px;
+            font-weight: 500;
             font-size: 1.1em;
+            color: var(--primary-color);
         }
 
         .options-container {
@@ -128,15 +122,15 @@
         .options-group {
             display: flex;
             justify-content: space-between;
-            gap: 5px;
+            gap: 8px;
         }
 
         .options-group label {
             cursor: pointer;
-            padding: 12px 0;
+            padding: 15px 0;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: #fff;
+            border-radius: 6px;
+            background-color: var(--bg-color);
             font-size: 0.9em;
             transition: all 0.2s ease;
             flex: 1;
@@ -145,12 +139,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            color: var(--text-muted);
         }
 
         .options-group label span {
-            font-size: 0.7em;
-            color: #888;
-            margin-top: 5px;
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 6px;
         }
 
         .options-group input:checked+label {
@@ -160,7 +155,7 @@
         }
 
         .options-group input:checked+label span {
-            color: #e0e0e0;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .options-group input {
@@ -171,134 +166,187 @@
             display: inline-block;
             background-color: var(--primary-color);
             color: white;
-            padding: 15px 25px;
+            padding: 18px 30px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.1em;
+            font-weight: 500;
             text-align: center;
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
             width: 100%;
             box-sizing: border-box;
             margin-top: 20px;
+            letter-spacing: 0.05em;
         }
 
-        .btn:hover {
-            background-color: #0056b3;
+        .btn:hover:not(:disabled) {
+            background-color: #1a252f;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .btn-line {
             background-color: var(--line-color);
             margin-top: 30px;
             padding: 20px 25px;
-            font-size: 1.3em;
-            animation: pulse 2s infinite;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-line:hover {
             background-color: #05a044;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(6, 199, 85, 0.7);
-            }
-
-            70% {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 10px rgba(6, 199, 85, 0);
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(6, 199, 85, 0);
-            }
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3);
         }
 
         .btn-secondary {
-            background-color: #fff;
-            color: var(--dark-gray);
+            background-color: transparent;
+            color: var(--text-muted);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background-color: #f8f9fa;
+            background-color: #f0f0f0;
+            color: var(--primary-color);
         }
 
         .results-summary h2 {
             text-align: center;
-            margin-bottom: 20px;
-            color: var(--danger-color);
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 1.4em;
         }
 
         .result-intro {
             text-align: center;
             font-size: 1.1em;
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #fff3cd;
+            margin-bottom: 35px;
+            padding: 25px;
+            background-color: #f8f9fa;
             border-radius: 8px;
-            border: 1px solid #ffeeba;
+            border-left: 4px solid var(--accent-color);
+            color: var(--text-main);
+            font-weight: 300;
         }
 
         .result-bar-container {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .result-bar-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 400;
+            font-size: 0.9em;
+            color: var(--text-muted);
         }
 
         .result-bar {
-            height: 20px;
-            background-color: var(--light-gray);
-            border-radius: 10px;
+            height: 6px;
+            background-color: #eee;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .result-bar-inner {
             height: 100%;
-            background-color: var(--primary-color);
-            transition: width 0.5s ease-in-out;
+            background-color: var(--accent-color);
+            transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .strongest-brakes {
-            margin-top: 30px;
-            padding: 25px;
-            border: 2px solid var(--danger-color);
+            margin-top: 35px;
+            padding: 35px 30px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             background-color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            text-align: center;
         }
 
         .strongest-brakes h2 {
             margin-top: 0;
-            color: var(--danger-color);
-            border-bottom: 2px solid var(--danger-color);
-            padding-bottom: 10px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .strongest-brakes .brake-desc {
+            font-weight: 300;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        .strongest-brakes .warning-text {
+            margin-top: 25px;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 0.95em;
+            padding: 15px;
+            background-color: rgba(184, 159, 122, 0.1);
+            border-radius: 4px;
+            text-align: left;
         }
 
         .cta-section {
-            margin-top: 40px;
+            margin-top: 45px;
             text-align: center;
-            padding: 30px;
-            background-color: #f8f9fa;
+            padding: 40px 30px;
+            background-color: var(--primary-color);
+            color: white;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
         }
 
         .cta-section h3 {
-            color: var(--dark-gray);
+            color: white;
             margin-top: 0;
+            font-weight: 500;
+            letter-spacing: 0.05em;
         }
 
         .cta-section p {
-            font-size: 1.1em;
+            font-size: 1.05em;
             margin-bottom: 20px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.2em;
+            }
+
+            .options-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .options-group label {
+                flex: 1 1 18%;
+                padding: 10px 0;
+            }
+
+            .options-group label span {
+                font-size: 0.65em;
+            }
         }
     </style>
 </head>
@@ -311,8 +359,8 @@
             {
                 id: 1,
                 name: "①価値＝期待 × 報酬の不足",
-                subtitle: "「がんばってもムダかも…」ストッパー",
-                description: "「どうせ無理」「得しても小さい」 → 行動コストが上回る・・・「どうせできないし、もらえるごほうびも少ない」と思ってしまう",
+                subtitle: "「がんばってもムダかも…」というストッパー",
+                description: "「どうせ無理」「得られるリターンが少ない」と見積もり、行動にかかるコストが上回っている状態です。「どうせできないし、もらえる報酬も少ない」と無意識に計算してしまっています。",
                 questions: [
                     "Q1. 行動を起こそうとした瞬間、「今のままの労力で得られるのは、小さな結果だけだろう」と冷静に予測してしまう。",
                     "Q2. 副業や起業で成功した人を見ると、「あの人は特別だから」と自分と切り離し、現状維持の安全な未来を想像して納得してしまう。"
@@ -321,8 +369,8 @@
             {
                 id: 2,
                 name: "②実行機能の枯渇",
-                subtitle: "「もう決めるの疲れた…」ストッパー",
-                description: "選択肢が多い・判断回数が多いと「もういいや」・・・えらぶこと・考えることが多すぎて、頭がぐるぐるして止まっちゃう",
+                subtitle: "「もう決めるのに疲れた…」というストッパー",
+                description: "選択肢が多い・判断回数が多いことによって「もういいや」とフリーズしています。選ぶことや考えることが多すぎて、脳のエネルギーが枯渇し、足が止まっている状態です。",
                 questions: [
                     "Q3. 情報を集めるだけで思考のエネルギーを使い切り、「残りの作業は明日まとめて考えよう」と先送りにするパターンが定着している。",
                     "Q4. 「Aのやり方」と「Bのやり方」のメリット・デメリットを比較し続けることで、結果的に「まだ検討中である状態」を長く維持している。"
@@ -331,8 +379,8 @@
             {
                 id: 3,
                 name: "③時間割引（先延ばし）",
-                subtitle: "「いま楽しいこと優先！」ストッパー",
-                description: "未来報酬＜即時快楽 → 先延ばし・・・先にもらえる大きなごほうびより、今すぐの小さな楽しさを選んでしまう",
+                subtitle: "「いま楽しいこと優先！」というストッパー",
+                description: "未来の大きな報酬よりも、即時の小さな快楽を優先してしまっています。将来手に入る大きな成果より、今すぐの小さな楽しさ（動画やスマホ）を選んでしまう心理状態です。",
                 questions: [
                     "Q5. 将来に向けた難しい作業よりも、目の前にある「今すぐ楽しめること（スマホ、動画、ゲーム）」をつい優先してしまう。",
                     "Q6. 「まとまった時間がとれる週末」や「もっと準備が整ったタイミング」など、自分が動きやすい完璧な条件を待つ状態が続いている。"
@@ -341,8 +389,8 @@
             {
                 id: 4,
                 name: "④負の情動優位",
-                subtitle: "「失敗したらどうしよう…」ストッパー",
-                description: "不安／恐怖＝回避シグナル → 行動抑制・・・こわい気持ちや不安が大きくて、行動にブレーキがかかる",
+                subtitle: "「失敗したらどうしよう…」というストッパー",
+                description: "不安や恐怖が「回避シグナル」として働き、行動を強力に抑制しています。傷つくことへの不安が大きすぎて、自ら足元に強いブレーキをかけている状態です。",
                 questions: [
                     "Q7. 新しい一歩を踏み出す前に、「失敗した時のリスク」や「周りからどう見られるか」という不安なシナリオを鮮明に思い描いてしまう。",
                     "Q8. 過去の小さな失敗や挫折の記憶が強く焼き付いており、「また同じ結果を繰り返すパターン」を無意識に予測してしまう。"
@@ -351,8 +399,8 @@
             {
                 id: 5,
                 name: "⑤習慣の惰性",
-                subtitle: "「いつものクセ…」ストッパー",
-                description: "旧習慣が自動発火 → 新行動が入り込む余地がない・・・ずっとやっている行動が勝手にスイッチオン。新しいことが入りにくい",
+                subtitle: "「いつもの心地よさ…」というストッパー",
+                description: "これまでの習慣が自動的に発火し、新しい行動が入り込む余地がなくなっています。ずっと続けている日常の心地よさが勝手に作動し、変化を拒んでいる状態です。",
                 questions: [
                     "Q9. 「今日こそはやるぞ！」と決意しても、帰宅するといつもの生活リズム（いつものソファに座る、ダラダラ過ごす等）にすんなり戻ってしまう。",
                     "Q10. 「新しいことに挑戦するエネルギー」を消費するよりも、昨日と同じことを繰り返す「現状維持の心地よさ」を深く実感している自分がいる。"
@@ -361,8 +409,8 @@
             {
                 id: 6,
                 name: "⑥自己同一性ギャップ",
-                subtitle: "「私らしくない…」ストッパー",
-                description: "「自分らしくない」と無意識で拒否・・・「こんなの自分っぽくない」と感じて、心が拒否しちゃう",
+                subtitle: "「私らしくない…」というストッパー",
+                description: "自分の中にあるセルフイメージと異なる行動を無意識に拒否しています。「こんなの自分っぽくない」「目立つのは性に合わない」と感じ、心がブレーキをかけています。",
                 questions: [
                     "Q11. 情報発信や自分を売り込むなど、「目立つ行動」をとる人を見ると、自分とは違うタイプだと感じ、距離を置こうとしてしまう。",
                     "Q12. 周りから求められている役割（良い会社員、良い親など）を守ることを優先し、自分の個人的な挑戦は後回しにするのが「自分らしい」と感じる。"
@@ -371,8 +419,8 @@
             {
                 id: 7,
                 name: "⑦環境制約・社会的摩擦",
-                subtitle: "「正論と環境の壁」ストッパー",
-                description: "対人摩擦・物理的障害で摩耗・・・周りの環境や人のせいで、やりたいことがやりにくい",
+                subtitle: "「正論と環境の壁」というストッパー",
+                description: "周囲との摩擦や物理的な制約を理由に、自らをすり減らしています。「家族のため」「仕事が忙しい」という正論を盾に、やりたいことを抑え込んでいる状態です。",
                 questions: [
                     "Q13. 「本業の忙しさ」や「家族との調和」といった客観的に正しい理由を、今の自分が動かないための「強力な鎧」として見事に使いこなしている自覚がある。",
                     "Q14. 新しい挑戦について身近な人に相談すると、相手が心配して止めてくる未来を想像し、「自分一人で抱え込んでおく方が波風が立たない」と判断してしまう。"
@@ -412,7 +460,7 @@
             return (
                 <div>
                     <div className="header">
-                        <h1>行動ブレーキ診断</h1>
+                        <h1>行動心理ブレーキ診断</h1>
                     </div>
                     <div className="content">
                         {page === 'intro' && <Intro onStart={startAssessment} />}
@@ -425,10 +473,12 @@
 
         const Intro = ({ onStart }) => (
             <div className="intro-text">
-                <p><strong>「なぜ、頭では分かっているのに動けないのか？」</strong></p>
-                <p>あなたが行動できないのは、意志が弱いからではありません。人間の心に備わっている無意識の「ストッパー（行動ブレーキ）」が強烈に働いているからです。</p>
-                <p>厳選された<strong>14の質問</strong>に直感で答えることで、あなたの決断を遅らせている「見えないブレーキの正体」を暴きます。</p>
-                <p>※各質問に対して「全くない(1)」〜「強くある(5)」の5段階で、最も直感に近いものを選んでください。</p>
+                <p style={{ fontSize: '1.2em', marginBottom: '30px', color: 'var(--primary-color)' }}>
+                    <strong>「なぜ、これほど情報を集めているのに、まだ動けないのか？」</strong>
+                </p>
+                <p>あなたが行動できないのは、意志が弱いからでも、勇気がないからでもありません。<br />人間の心に深く刻まれた『現状維持という名の防衛本能（行動ブレーキ）』が静かに作動しているからです。</p>
+                <p>厳選された<strong>14の問い</strong>に直感で答えてみてください。<br />あなたが3年間、言い訳にしてきた「見えないブレーキの正体」をひも解きます。</p>
+                <p style={{ fontSize: '0.9em', color: 'var(--text-muted)' }}>※各質問に対して「全くない(1)」〜「強くある(5)」の5段階で、最も直感に近いものを選んでください。</p>
                 <button className="btn" onClick={onStart}>無料診断をはじめる（約1分）</button>
             </div>
         );
@@ -462,9 +512,9 @@
 
             return (
                 <div>
-                    <div style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 100, padding: '10px 0', borderBottom: '1px solid #eee', marginBottom: '20px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9em', color: '#666' }}>
-                            <span>進捗状況</span>
+                    <div style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-color)', zIndex: 100, padding: '15px 0', borderBottom: '1px solid var(--border-color)', marginBottom: '30px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9em', color: 'var(--text-muted)' }}>
+                            <span>診断の進捗</span>
                             <span>{answeredCount} / 14 問</span>
                         </div>
                         <div className="progress-container">
@@ -504,7 +554,7 @@
                             })}
                         </div>
                     ))}
-                    <button className="btn" onClick={handleSubmit} disabled={answeredCount < 14} style={{ opacity: answeredCount < 14 ? 0.5 : 1 }}>
+                    <button className="btn" onClick={handleSubmit} disabled={answeredCount < 14}>
                         {answeredCount < 14 ? 'すべての質問に答えて結果を見る' : '結果を見る'}
                     </button>
                 </div>
@@ -526,45 +576,47 @@
 
             return (
                 <div className="results-summary">
-                    <h2>🚨 あなたの重大なブレーキが判明しました</h2>
+                    <h2>診断が完了しました</h2>
 
                     <div className="result-intro">
-                        あなたの行動を最も強く阻害しているのは、<br />
-                        <strong>【{strongestBrake.name}】</strong>（{strongestBrake.subtitle}）です。
+                        あなたが3年間、動き出せなかった「本当の理由」。<br />
+                        それを引き起こしている最も強力なブレーキは、<br />
+                        <span style={{ color: 'var(--primary-color)', fontSize: '1.2em', fontWeight: '500', display: 'inline-block', marginTop: '10px' }}>【{strongestBrake.name}】</span><br />
+                        <span style={{ fontSize: '0.9em', color: 'var(--text-muted)' }}>（{strongestBrake.subtitle}）</span>です。
                     </div>
 
                     <div className="strongest-brakes">
-                        <h2>{strongestBrake.name}</h2>
-                        <p><strong>特徴：</strong></p>
-                        <p>{strongestBrake.description}</p>
-                        <p style={{ marginTop: '20px', color: '#dc3545', fontWeight: 'bold' }}>
-                            ⚠️ このブレーキに囚われている人は、同じ言い訳を繰り返し、3年後も全く同じ悩みを抱え続ける確率が極めて高い状態です。
-                        </p>
+                        <h2>{strongestBrake.name} の正体</h2>
+                        <div className="brake-desc">{strongestBrake.description}</div>
+                        <div className="warning-text">
+                            このブレーキは、あなたが失敗から自分を守ろうとする正常な防衛本能です。<br /><br />
+                            しかし、この状態を放置し「正論の影」に隠れ続ければ、あなたの人生の「判断」だけが、いつまでも置き去りにされていきます。
+                        </div>
                     </div>
 
                     <div className="cta-section">
-                        <h3>このブレーキを外す準備はできましたか？</h3>
-                        <p>自分一人でこの強力な無意識のブレーキを外すのは至難の業です。</p>
+                        <h3>そろそろ、自分の言葉で決着をつけませんか？</h3>
+                        <p>自分一人でこの強固な無意識のブレーキを外すのは至難の業です。</p>
                         <p>あなたの「後悔しない決断」をサポートするための<strong>特別な処方箋（PDFレポート）</strong>を、LINE公式アカウントで無料プレゼントしています。</p>
-                        <p>動かないなら動かないでいい。ただ、自分の言葉で選べるようになりませんか？</p>
+                        <p style={{ fontSize: '0.95em' }}>※動かないなら動かないでいい。ただ、自分の言葉で選べるようになりませんか？</p>
 
                         <a href="https://lin.ee/cpFchMao" target="_blank" className="btn btn-line" style={{ display: 'block', textDecoration: 'none' }}>
-                            LINEでブレーキ解除の処方箋を受け取る
+                            「保留」を「決断」に変える処方箋を受け取る（無料）
                         </a>
                     </div>
 
-                    <button className="btn btn-secondary" onClick={onRestart} style={{ marginTop: '40px' }}>もう一度診断する</button>
+                    <button className="btn btn-secondary" onClick={onRestart} style={{ marginTop: '40px' }}>もう一度診断をやり直す</button>
 
-                    <div style={{ marginTop: '40px' }}>
-                        <h4 style={{ textAlign: 'center', color: '#666' }}>その他すべてのブレーキのスコア</h4>
+                    <div style={{ marginTop: '50px', padding: '30px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                        <h4 style={{ textAlign: 'center', color: 'var(--primary-color)', marginTop: 0, marginBottom: '25px', fontWeight: '500' }}>あなたのすべてのブレーキ・スコア</h4>
                         {sortedResults.map(res => (
-                            <div key={res.id} className="result-bar-container" style={{ opacity: 0.7 }}>
-                                <div className="result-bar-label" style={{ fontSize: '0.9em', color: '#555' }}>
+                            <div key={res.id} className="result-bar-container">
+                                <div className="result-bar-label">
                                     <span>{res.name}</span>
-                                    <span>{res.totalScore} / 10 危険度</span>
+                                    <span>{res.totalScore} / 10 </span>
                                 </div>
-                                <div className="result-bar" style={{ height: '8px', backgroundColor: '#e9ecef' }}>
-                                    <div className="result-bar-inner" style={{ width: `${res.totalScore * 10}%`, backgroundColor: '#6c757d' }}></div>
+                                <div className="result-bar">
+                                    <div className="result-bar-inner" style={{ width: `${res.totalScore * 10}%`, backgroundColor: res.totalScore > 7 ? 'var(--primary-color)' : 'var(--accent-color)' }}></div>
                                 </div>
                             </div>
                         ))}
